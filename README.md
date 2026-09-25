@@ -40,15 +40,25 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
 A global setting is inserted with the calling app's identity while the call is processed. In AOSP ([android15-release, `DevicePolicyManagerService.clearResetPasswordToken`](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/android15-release/services/devicepolicy/java/com/android/server/devicepolicy/DevicePolicyManagerService.java)) this method writes no global setting; with no token set it returns `false`.
 
-Full log of the run: [`evidence/ct70_615.00.01.0040-G_2026-09-25_logcat.txt`](evidence/ct70_615.00.01.0040-G_2026-09-25_logcat.txt) (recorded with the same test code under the earlier package name `de.ixtech.echodpc`).
+Log of the run with this probe (both phases): [`evidence/ct70_615.00.01.0040-G_2026-09-25_probe-1.0_logcat.txt`](evidence/ct70_615.00.01.0040-G_2026-09-25_probe-1.0_logcat.txt). Probe 1.1 differs from 1.0 only in the result text (the step name was printed twice on exceptions).
 
 ## Impact
 
 The BlackBerry UEM Client (12.54.2) calls `clearResetPasswordToken` in the admin policy compliance step of a "Work space only" (fully managed) activation. The exception aborts the activation, the client shows error 3006 and factory-resets the device. Fully managed enrollment with BlackBerry UEM is therefore not possible on this CT70 build.
 
-## Reproduce
+## Requirements
 
-Prerequisites: CT70 after a **Factory Reset** (not Enterprise Reset), a PC in the same Wi-Fi with Python 3, optionally `pip install segno` for the QR image and `adb`.
+| Item | Needed for | Notes |
+|---|---|---|
+| CT70 after a **Factory Reset** (not Enterprise Reset) | test | Wi-Fi with access to the PC below |
+| PC in the same network | serving the APK | port 8765 reachable from the CT70 |
+| Python 3.8 or newer | `tools/make_qr.py`, `python -m http.server` | standard library only |
+| `segno` (`pip install segno`) | QR image | optional; without it, encode `qr-provisioning.json` with any QR generator |
+| Android SDK build-tools (`apksigner`, via `ANDROID_HOME`) | signature checksum in the QR code | optional; without it the SHA-256 of the APK file is used, which works as well |
+| `adb` (Android SDK platform-tools) | step 8 and logs | optional |
+| JDK 17 and Android SDK 35 | building the APK | only if you do not use `dist/ct70-probe.apk` |
+
+## Reproduce
 
 1. Use the prebuilt `dist/ct70-probe.apk` (SHA-256 in `dist/SHA256SUMS`), or build it: `gradlew assembleDebug` (JDK 17, Android SDK 35), output `app/build/outputs/apk/debug/app-debug.apk`.
 2. Serve the APK: `cd dist` and `python -m http.server 8765`. Provisioning on the CT70 accepts an HTTP download location.

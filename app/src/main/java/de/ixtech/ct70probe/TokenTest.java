@@ -53,11 +53,13 @@ final class TokenTest {
     }
 
     private static void step(StringBuilder sb, String name, Call call) {
+        Object outcome;
         try {
-            sb.append(name).append(" -> ").append(call.run()).append('\n');
+            outcome = call.run();
         } catch (Throwable t) {
-            sb.append(name).append(" -> ").append(t).append('\n');
+            outcome = t;
             Log.e(TAG, name, t);
         }
+        sb.append(name).append(" -> ").append(outcome).append('\n');
     }
 }
