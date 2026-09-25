@@ -1,0 +1,50 @@
+09-25 11:39:17.284 I/DevicePolicyManager( 2636): Device owner set: ComponentInfo{de.ixtech.echodpc/de.ixtech.echodpc.EchoAdminReceiver} on user 0
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): clearResetPasswordToken (no token set)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): java.lang.SecurityException: Permission denial, must have one of: [android.permission.WRITE_SECURE_SETTINGS]
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3242)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.os.Parcel.createException(Parcel.java:3226)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.os.Parcel.readException(Parcel.java:3209)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.os.Parcel.readException(Parcel.java:3151)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.app.admin.IDevicePolicyManager$Stub$Proxy.clearResetPasswordToken(IDevicePolicyManager.java:11834)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.app.admin.DevicePolicyManager.clearResetPasswordToken(DevicePolicyManager.java:6326)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at de.ixtech.echodpc.TokenTest.lambda$run$0(TokenTest.java:29)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at de.ixtech.echodpc.TokenTest$$ExternalSyntheticLambda0.run(D8$$SyntheticClass:0)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at de.ixtech.echodpc.TokenTest.step(TokenTest.java:44)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at de.ixtech.echodpc.TokenTest.run(TokenTest.java:29)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at de.ixtech.echodpc.PolicyComplianceActivity.onCreate(PolicyComplianceActivity.java:17)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.app.Activity.performCreate(Activity.java:9002)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.app.Activity.performCreate(Activity.java:8980)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1527)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:4031)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:4236)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.app.servertransaction.LaunchActivityItem.execute(LaunchActivityItem.java:112)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.app.servertransaction.TransactionExecutor.executeNonLifecycleItem(TransactionExecutor.java:174)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.app.servertransaction.TransactionExecutor.executeTransactionItems(TransactionExecutor.java:109)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.app.servertransaction.TransactionExecutor.execute(TransactionExecutor.java:81)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2637)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.os.Handler.dispatchMessage(Handler.java:107)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.os.Looper.loopOnce(Looper.java:232)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.os.Looper.loop(Looper.java:317)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.app.ActivityThread.main(ActivityThread.java:8754)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at java.lang.reflect.Method.invoke(Native Method)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:892)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): Caused by: android.os.RemoteException: Remote stack trace:
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at com.android.providers.settings.SettingsProvider.enforceHasAtLeastOnePermission(SettingsProvider.java:2383)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at com.android.providers.settings.SettingsProvider.mutateGlobalSetting(SettingsProvider.java:1518)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at com.android.providers.settings.SettingsProvider.insertGlobalSetting(SettingsProvider.java:1472)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at com.android.providers.settings.SettingsProvider.call(SettingsProvider.java:463)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 	at android.content.ContentProvider.call(ContentProvider.java:2704)
+09-25 11:39:38.972 E/EchoDpcTokenTest( 9912): 
+09-25 11:39:40.737 I/EchoDpcTokenTest( 9912): == RESET PASSWORD TOKEN TEST (admin policy compliance)
+09-25 11:39:40.737 I/EchoDpcTokenTest( 9912): deviceOwner = true
+09-25 11:39:40.737 I/EchoDpcTokenTest( 9912): clearResetPasswordToken (no token set) -> clearResetPasswordToken (no token set) -> java.lang.SecurityException: Permission denial, must have one of: [android.permission.WRITE_SECURE_SETTINGS]
+09-25 11:39:40.737 I/EchoDpcTokenTest( 9912): setResetPasswordToken -> true
+09-25 11:39:40.737 I/EchoDpcTokenTest( 9912): isResetPasswordTokenActive -> true
+09-25 11:39:40.737 I/EchoDpcTokenTest( 9912): clearResetPasswordToken (token set) -> true
+09-25 11:41:20.170 I/EchoDpcTokenTest( 9912): == RESET PASSWORD TOKEN TEST (after setup)
+09-25 11:41:20.171 I/EchoDpcTokenTest( 9912): deviceOwner = true
+09-25 11:41:20.171 I/EchoDpcTokenTest( 9912): clearResetPasswordToken (no token set) -> false
+09-25 11:41:20.171 I/EchoDpcTokenTest( 9912): setResetPasswordToken -> true
+09-25 11:41:20.171 I/EchoDpcTokenTest( 9912): isResetPasswordTokenActive -> true
+09-25 11:41:20.171 I/EchoDpcTokenTest( 9912): clearResetPasswordToken (token set) -> true
