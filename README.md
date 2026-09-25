@@ -4,11 +4,12 @@ On a Honeywell CT70 with Android 15, a device owner that calls `DevicePolicyMana
 
 ## Tested device
 
-| Item | Value |
-|---|---|
-| Model | CT70 (product CT70-L0-G), Wi-Fi only |
-| Build | 615.00.01.0040-G |
-| Android | 15, security patch 2025-08-05, GMS |
+CT70 (product CT70-L0-G), Wi-Fi only, Android 15, GMS. Same result on both builds:
+
+| Build | Security patch | Probe | Log |
+|---|---|---|---|
+| 615.00.01.0040-G | 2025-08-05 | 1.0 | [`evidence/ct70_615.00.01.0040-G_2026-09-25_probe-1.0_logcat.txt`](evidence/ct70_615.00.01.0040-G_2026-09-25_probe-1.0_logcat.txt) |
+| 615.00.05.0089-G | 2026-07-05 | 1.1 | [`evidence/ct70_615.00.05.0089-G_2026-09-25_probe-1.1_logcat.txt`](evidence/ct70_615.00.05.0089-G_2026-09-25_probe-1.1_logcat.txt) |
 
 ## Result
 
@@ -19,7 +20,7 @@ On a Honeywell CT70 with Android 15, a device owner that calls `DevicePolicyMana
 | 3 | `isResetPasswordTokenActive` | `true` | `true` |
 | 4 | `clearResetPasswordToken` (token set) | `true` | `true` |
 
-Stack trace of step 1 during setup:
+Stack trace of step 1 during setup (build 615.00.01.0040-G; on 615.00.05.0089-G only the `Parcel` and `ContentProvider` line numbers differ):
 
 ```
 java.lang.SecurityException: Permission denial, must have one of: [android.permission.WRITE_SECURE_SETTINGS]
@@ -40,11 +41,11 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
 A global setting is inserted with the calling app's identity while the call is processed. In AOSP ([android15-release, `DevicePolicyManagerService.clearResetPasswordToken`](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/android15-release/services/devicepolicy/java/com/android/server/devicepolicy/DevicePolicyManagerService.java)) this method writes no global setting; with no token set it returns `false`.
 
-Log of the run with this probe (both phases): [`evidence/ct70_615.00.01.0040-G_2026-09-25_probe-1.0_logcat.txt`](evidence/ct70_615.00.01.0040-G_2026-09-25_probe-1.0_logcat.txt). Probe 1.1 differs from 1.0 only in the result text (the step name was printed twice on exceptions).
+Probe 1.1 differs from 1.0 only in the result text (1.0 printed the step name twice on exceptions).
 
 ## Impact
 
-The BlackBerry UEM Client (12.54.2) calls `clearResetPasswordToken` in the admin policy compliance step of a "Work space only" (fully managed) activation. The exception aborts the activation, the client shows error 3006 and factory-resets the device. Fully managed enrollment with BlackBerry UEM is therefore not possible on this CT70 build.
+The BlackBerry UEM Client (12.54.2) calls `clearResetPasswordToken` in the admin policy compliance step of a "Work space only" (fully managed) activation. The exception aborts the activation, the client shows error 3006 and factory-resets the device. Fully managed enrollment with BlackBerry UEM is therefore not possible on these CT70 builds.
 
 ## Requirements
 
