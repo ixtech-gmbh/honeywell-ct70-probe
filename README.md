@@ -47,6 +47,29 @@ Probe 1.1 differs from 1.0 only in the result text (1.0 printed the step name tw
 
 The BlackBerry UEM Client (12.54.2) calls `clearResetPasswordToken` in the admin policy compliance step of a "Work space only" (fully managed) activation. The exception aborts the activation, the client shows error 3006 and factory-resets the device. Fully managed enrollment with BlackBerry UEM is therefore not possible on these CT70 builds.
 
+## Notes
+
+**Early return in both token methods.** In AOSP, `setResetPasswordToken` and `clearResetPasswordToken` start with the same check:
+
+```java
+if (!mHasFeature || !mLockPatternUtils.hasSecureLockScreen()) {
+    return false;
+}
+```
+
+`hasSecureLockScreen()` reports the device feature `android.software.secure_lock_screen` (`LockSettingsService`: `mHasSecureLockScreen = pm.hasSystemFeature(FEATURE_SECURE_LOCK_SCREEN)`), not whether a screen lock is set. On the CT70, step 2 (`setResetPasswordToken`) returns `true` during setup, so the check is passed. Check on a device: `adb shell pm has-feature android.software.secure_lock_screen`.
+
+**Origin of the exception.** The exception is raised in `system_server` while it processes the call (remote stack trace above): `SettingsProvider` checks `WRITE_SECURE_SETTINGS` against the identity of the calling app. The key of the global setting is not logged.
+
+**API contract.** The probe is device owner when it runs the test (`device owner = true` in the result). According to the `DevicePolicyManager` documentation, `clearResetPasswordToken` throws a `SecurityException` only if the caller is not a device or profile owner and does not hold `MANAGE_DEVICE_POLICY_RESET_PASSWORD`. `ACTION_ADMIN_POLICY_COMPLIANCE` is the step in which the admin can apply its policies before the end of the setup wizard.
+
+**Enrollment.** QR code provisioning only, no `afw#` identifier, no Enterprise Provisioner apart from the optional ADB barcode in step 9. Both scan paths in step 4 end in `PROVISION_MANAGED_DEVICE_FROM_TRUSTED_SOURCE` with the Google setup wizard and fail identically. In the UEM environment where the CT70 fails, devices from other manufacturers are activated with the same procedure without errors.
+
+## Open points
+
+- Which global setting is written during the call, and by which component.
+- Workaround, not yet tested: grant `WRITE_SECURE_SETTINGS` to the device owner app before provisioning (preinstall it with the Enterprise Provisioner, run `pm grant <package> android.permission.WRITE_SECURE_SETTINGS`, then scan the QR code). `pm grant` only works for apps that request the permission in their manifest; probe 1.1 does not. Whether the BlackBerry UEM Client requests it is not known.
+
 ## Requirements
 
 | Item | Needed for | Notes |
