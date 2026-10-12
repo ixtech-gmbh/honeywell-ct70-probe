@@ -41,7 +41,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
 A global setting is inserted with the calling app's identity while the call is processed. In AOSP ([android15-release, `DevicePolicyManagerService.clearResetPasswordToken`](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/android15-release/services/devicepolicy/java/com/android/server/devicepolicy/DevicePolicyManagerService.java)) this method writes no global setting; with no token set it returns `false`.
 
-Probe 1.1 differs from 1.0 only in the result text (1.0 printed the step name twice on exceptions).
+Probe 1.1 differs from 1.0 only in the result text (1.0 printed the step name twice on exceptions). Probe 1.2 additionally requests `WRITE_SECURE_SETTINGS` in its manifest (not granted unless `pm grant` is run, see Open points) and prints whether it is granted.
 
 ## Impact
 
@@ -68,7 +68,7 @@ if (!mHasFeature || !mLockPatternUtils.hasSecureLockScreen()) {
 ## Open points
 
 - Which global setting is written during the call, and by which component.
-- Workaround, not yet tested: grant `WRITE_SECURE_SETTINGS` to the device owner app before provisioning (preinstall it with the Enterprise Provisioner, run `pm grant <package> android.permission.WRITE_SECURE_SETTINGS`, then scan the QR code). `pm grant` only works for apps that request the permission in their manifest; probe 1.1 does not. Whether the BlackBerry UEM Client requests it is not known.
+- Workaround, not yet tested: grant `WRITE_SECURE_SETTINGS` to the device owner app before provisioning (preinstall it with the Enterprise Provisioner, run `pm grant <package> android.permission.WRITE_SECURE_SETTINGS`, then scan the QR code). `pm grant` only works for apps that request the permission in their manifest; probe 1.2 does. Whether the BlackBerry UEM Client requests it is not known.
 
 ## Requirements
 

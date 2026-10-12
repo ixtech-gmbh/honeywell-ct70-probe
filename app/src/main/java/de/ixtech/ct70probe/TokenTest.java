@@ -4,6 +4,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
@@ -33,6 +34,9 @@ final class TokenTest {
         sb.append("user_setup_complete = ")
                 .append(Settings.Secure.getInt(context.getContentResolver(), "user_setup_complete", -1)).append('\n');
         sb.append("device owner = ").append(dpm.isDeviceOwnerApp(context.getPackageName())).append('\n');
+        sb.append("WRITE_SECURE_SETTINGS granted = ")
+                .append(context.checkSelfPermission(android.Manifest.permission.WRITE_SECURE_SETTINGS)
+                        == PackageManager.PERMISSION_GRANTED).append('\n');
         step(sb, "1 clearResetPasswordToken (no token set)", () -> dpm.clearResetPasswordToken(admin));
         byte[] token = new byte[32];
         new SecureRandom().nextBytes(token);
