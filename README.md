@@ -41,7 +41,28 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
 A global setting is inserted with the calling app's identity while the call is processed. In AOSP ([android15-release, `DevicePolicyManagerService.clearResetPasswordToken`](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/android15-release/services/devicepolicy/java/com/android/server/devicepolicy/DevicePolicyManagerService.java)) this method writes no global setting; with no token set it returns `false`.
 
-Probe 1.1 differs from 1.0 only in the result text (1.0 printed the step name twice on exceptions). Probe 1.2 additionally requests `WRITE_SECURE_SETTINGS` in its manifest (not granted unless `pm grant` is run, see Open points) and prints whether it is granted.
+Probe 1.1 differs from 1.0 only in the result text (1.0 printed the step name twice on exceptions). Probe 1.2 additionally requests `WRITE_SECURE_SETTINGS` in its manifest (not granted unless `pm grant` is run) and prints whether it is granted.
+
+## Result with `WRITE_SECURE_SETTINGS` granted
+
+Probe 1.2 preinstalled during setup and granted the permission before provisioning (Reproduce, step 10). Build 615.00.05.0089-G, log: [`evidence/ct70_615.00.05.0089-G_2026-10-08_probe-1.2_pm-grant_logcat.txt`](evidence/ct70_615.00.05.0089-G_2026-10-08_probe-1.2_pm-grant_logcat.txt). The permission stays granted through provisioning (`WRITE_SECURE_SETTINGS granted = true` in both phases).
+
+| Step | Call | During setup | After setup |
+|---|---|---|---|
+| 1 | `clearResetPasswordToken` (no token set) | **`SecurityException: Package android does not belong to 10223`** | `false` |
+| 2 to 4 | as above | as above | as above |
+
+Remote stack trace of step 1 during setup:
+
+```
+at android.app.AppOpsManager.checkPackage(AppOpsManager.java:9366)
+at android.content.ContentProvider.getCallingAttributionSource(ContentProvider.java:1199)
+at android.content.ContentProvider.getCallingPackage(ContentProvider.java:1179)
+at com.android.providers.settings.SettingsProvider.mutateGlobalSetting(SettingsProvider.java:1529)
+at com.android.providers.settings.SettingsProvider.insertGlobalSetting(SettingsProvider.java:1472)
+```
+
+The permission check in `mutateGlobalSetting` now passes; the next check fails. The global setting is written in the name of package `android` (`system_server`), while the calling UID is still that of the device owner app (10223 = UID of the probe in this run). Granting the permission does not avoid the failure.
 
 ## Impact
 
@@ -57,9 +78,9 @@ if (!mHasFeature || !mLockPatternUtils.hasSecureLockScreen()) {
 }
 ```
 
-`hasSecureLockScreen()` reports the device feature `android.software.secure_lock_screen` (`LockSettingsService`: `mHasSecureLockScreen = pm.hasSystemFeature(FEATURE_SECURE_LOCK_SCREEN)`), not whether a screen lock is set. On the CT70, step 2 (`setResetPasswordToken`) returns `true` during setup, so the check is passed. Check on a device: `adb shell pm has-feature android.software.secure_lock_screen`.
+`hasSecureLockScreen()` reports the device feature `android.software.secure_lock_screen` (`LockSettingsService`: `mHasSecureLockScreen = pm.hasSystemFeature(FEATURE_SECURE_LOCK_SCREEN)`), not whether a screen lock is set. On the CT70, step 2 (`setResetPasswordToken`) returns `true` during setup, so the check is passed. `adb shell pm has-feature android.software.secure_lock_screen` returns `true` on the CT70 (615.00.05.0089-G).
 
-**Origin of the exception.** The exception is raised in `system_server` while it processes the call (remote stack trace above): `SettingsProvider` checks `WRITE_SECURE_SETTINGS` against the identity of the calling app. The key of the global setting is not logged.
+**Origin of the exception.** The exception is raised in `system_server` while it processes the call (remote stack traces above): the global setting is inserted by code running as package `android` under the UID of the calling app, so `SettingsProvider` checks the calling app's permissions and package. The key of the global setting is not logged.
 
 **API contract.** The probe is device owner when it runs the test (`device owner = true` in the result). According to the `DevicePolicyManager` documentation, `clearResetPasswordToken` throws a `SecurityException` only if the caller is not a device or profile owner and does not hold `MANAGE_DEVICE_POLICY_RESET_PASSWORD`. `ACTION_ADMIN_POLICY_COMPLIANCE` is the step in which the admin can apply its policies before the end of the setup wizard.
 
@@ -67,8 +88,7 @@ if (!mHasFeature || !mLockPatternUtils.hasSecureLockScreen()) {
 
 ## Open points
 
-- Which global setting is written during the call, and by which component.
-- Workaround, not yet tested: grant `WRITE_SECURE_SETTINGS` to the device owner app before provisioning (preinstall it with the Enterprise Provisioner, run `pm grant <package> android.permission.WRITE_SECURE_SETTINGS`, then scan the QR code). `pm grant` only works for apps that request the permission in their manifest; probe 1.2 does. Whether the BlackBerry UEM Client requests it is not known.
+- Which global setting is written during the call, and by which `system_server` component.
 
 ## Requirements
 
@@ -92,7 +112,8 @@ if (!mHasFeature || !mLockPatternUtils.hasSecureLockScreen()) {
 6. The setup wizard downloads the probe and sets it as device owner. In the admin policy compliance step the probe runs the test and shows the block "DURING SETUP" (result table above, column "During setup").
 7. Tap **Continue setup** and finish the setup wizard.
 8. Run the test again after setup: `adb shell am start -n de.ixtech.ct70probe/.TokenTestActivity`. The block "AFTER SETUP" is appended. The app "CT70 Probe" shows all results.
-9. Logs: `adb logcat -s CT70Probe:*`. Exceptions are logged with the full stack trace. To record logcat during setup, enable ADB in the setup wizard first with an Enterprise Provisioner barcode (`adb_enabled` = 1, "Keep Setup Wizard running" = 1).
+9. Logs: `adb logcat -s CT70Probe:*`. Exceptions are logged with the full stack trace. To record logcat during setup, enable ADB in the setup wizard first with an Enterprise Provisioner barcode (`adb_enabled` = 1, "Keep Setup Wizard running" = 1). If the setup wizard then stays on "Please wait...", run `adb reboot`; it comes back to the "Set up your CT70" scan screen.
+10. Variant with the permission granted: after enabling ADB as in step 9 and before step 4, run `adb install dist/ct70-probe.apk` and `adb shell pm grant de.ixtech.ct70probe android.permission.WRITE_SECURE_SETTINGS`, then continue with step 4.
 
 ## Contents
 
@@ -101,4 +122,4 @@ if (!mHasFeature || !mLockPatternUtils.hasSecureLockScreen()) {
 | `app/` | Probe source (device admin receiver, provisioning mode and policy compliance activities, test) |
 | `dist/ct70-probe.apk` | Prebuilt APK, debug-signed |
 | `tools/make_qr.py` | Creates the provisioning QR code for a given download URL |
-| `evidence/` | Logcat of the run on the tested device |
+| `evidence/` | Logcat of the runs on the tested device |

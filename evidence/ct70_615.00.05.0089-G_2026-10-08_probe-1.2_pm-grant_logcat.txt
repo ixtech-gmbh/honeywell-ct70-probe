@@ -1,0 +1,56 @@
+10-08 10:00:57.881 I/DevicePolicyManager(2639): Device owner set: ComponentInfo{de.ixtech.ct70probe/de.ixtech.ct70probe.ProbeAdminReceiver} on user 0
+10-08 10:01:27.394 E/CT70Probe(9430): 1 clearResetPasswordToken (no token set)
+10-08 10:01:27.394 E/CT70Probe(9430): java.lang.SecurityException: Package android does not belong to 10223
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3241)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.os.Parcel.createException(Parcel.java:3225)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.os.Parcel.readException(Parcel.java:3208)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.os.Parcel.readException(Parcel.java:3150)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.app.admin.IDevicePolicyManager$Stub$Proxy.clearResetPasswordToken(IDevicePolicyManager.java:11834)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.app.admin.DevicePolicyManager.clearResetPasswordToken(DevicePolicyManager.java:6326)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at de.ixtech.ct70probe.TokenTest.lambda$run$0(TokenTest.java:40)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at de.ixtech.ct70probe.TokenTest$$ExternalSyntheticLambda0.run(D8$$SyntheticClass:0)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at de.ixtech.ct70probe.TokenTest.step(TokenTest.java:62)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at de.ixtech.ct70probe.TokenTest.run(TokenTest.java:40)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at de.ixtech.ct70probe.PolicyComplianceActivity.onCreate(PolicyComplianceActivity.java:16)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.app.Activity.performCreate(Activity.java:9002)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.app.Activity.performCreate(Activity.java:8980)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1527)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:4031)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:4236)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.app.servertransaction.LaunchActivityItem.execute(LaunchActivityItem.java:112)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.app.servertransaction.TransactionExecutor.executeNonLifecycleItem(TransactionExecutor.java:174)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.app.servertransaction.TransactionExecutor.executeTransactionItems(TransactionExecutor.java:109)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.app.servertransaction.TransactionExecutor.execute(TransactionExecutor.java:81)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2637)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.os.Handler.dispatchMessage(Handler.java:107)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.os.Looper.loopOnce(Looper.java:232)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.os.Looper.loop(Looper.java:317)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.app.ActivityThread.main(ActivityThread.java:8754)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at java.lang.reflect.Method.invoke(Native Method)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:892)
+10-08 10:01:27.394 E/CT70Probe(9430): Caused by: android.os.RemoteException: Remote stack trace:
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.app.AppOpsManager.checkPackage(AppOpsManager.java:9366)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.content.ContentProvider.getCallingAttributionSource(ContentProvider.java:1199)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at android.content.ContentProvider.getCallingPackage(ContentProvider.java:1179)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at com.android.providers.settings.SettingsProvider.mutateGlobalSetting(SettingsProvider.java:1529)
+10-08 10:01:27.394 E/CT70Probe(9430): 	at com.android.providers.settings.SettingsProvider.insertGlobalSetting(SettingsProvider.java:1472)
+10-08 10:01:27.394 E/CT70Probe(9430): 
+10-08 10:01:28.653 I/CT70Probe(9430): == DURING SETUP (admin policy compliance step)
+10-08 10:01:28.653 I/CT70Probe(9430): device: CT70, build 615.00.05.0089-G, Android 15, patch 2026-07-05
+10-08 10:01:28.653 I/CT70Probe(9430): user_setup_complete = 0
+10-08 10:01:28.653 I/CT70Probe(9430): device owner = true
+10-08 10:01:28.653 I/CT70Probe(9430): WRITE_SECURE_SETTINGS granted = true
+10-08 10:01:28.653 I/CT70Probe(9430): 1 clearResetPasswordToken (no token set) -> java.lang.SecurityException: Package android does not belong to 10223
+10-08 10:01:28.653 I/CT70Probe(9430): 2 setResetPasswordToken -> true
+10-08 10:01:28.653 I/CT70Probe(9430): 3 isResetPasswordTokenActive -> true
+10-08 10:01:28.653 I/CT70Probe(9430): 4 clearResetPasswordToken (token set) -> true
+10-08 10:04:38.446 I/CT70Probe(9430): == AFTER SETUP
+10-08 10:04:38.447 I/CT70Probe(9430): device: CT70, build 615.00.05.0089-G, Android 15, patch 2026-07-05
+10-08 10:04:38.447 I/CT70Probe(9430): user_setup_complete = 1
+10-08 10:04:38.447 I/CT70Probe(9430): device owner = true
+10-08 10:04:38.447 I/CT70Probe(9430): WRITE_SECURE_SETTINGS granted = true
+10-08 10:04:38.447 I/CT70Probe(9430): 1 clearResetPasswordToken (no token set) -> false
+10-08 10:04:38.447 I/CT70Probe(9430): 2 setResetPasswordToken -> true
+10-08 10:04:38.447 I/CT70Probe(9430): 3 isResetPasswordTokenActive -> true
+10-08 10:04:38.447 I/CT70Probe(9430): 4 clearResetPasswordToken (token set) -> true
