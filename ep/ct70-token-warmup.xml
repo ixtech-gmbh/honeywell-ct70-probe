@@ -1,0 +1,28 @@
+<ConfigDoc name='Provisioner'>
+   <SettingsPackage>pkg/HON660/[89-90].00.03/</SettingsPackage>
+   <Section name='CommandTask'>
+      <Key name='Action'>ClearAllTasks</Key>
+   </Section>
+   <Section name='Tasks'>
+      <Section name='Task'>
+         <Key name='Action'>WaitForNetwork</Key>
+         <Key name='TaskExecutionSet'>1</Key>
+      </Section>
+      <Section name='Task'>
+         <Key name='Action'>InstallApk</Key>
+         <Key name='Source'>https://raw.githubusercontent.com/ixtech-gmbh/honeywell-ct70-probe/main/dist/ct70-warmup.apk</Key>
+         <Key name='Launch'>de.ixtech.ct70warmup</Key>
+         <Key name='TaskExecutionSet'>1</Key>
+      </Section>
+      <Section name='Task'>
+         <Key name='Action'>Delay</Key>
+         <Key name='Source'>5</Key>
+         <Key name='TaskExecutionSet'>1</Key>
+      </Section>
+      <Section name='Task'>
+         <Key name='Action'>Run</Key>
+         <Key name='Launch'>pm uninstall de.ixtech.ct70warmup</Key>
+         <Key name='TaskExecutionSet'>1</Key>
+      </Section>
+   </Section>
+</ConfigDoc>

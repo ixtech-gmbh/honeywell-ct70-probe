@@ -12,4 +12,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "honeywell-ct70-probe"
-include(":app")
+include(":app", ":warmup")

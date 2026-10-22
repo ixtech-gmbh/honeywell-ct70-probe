@@ -1,6 +1,6 @@
 # CT70 probe: `DevicePolicyManager.clearResetPasswordToken` fails during setup
 
-On a Honeywell CT70 with Android 15, a device owner that calls `DevicePolicyManager.clearResetPasswordToken` while no reset password token exists gets a `SecurityException` for `WRITE_SECURE_SETTINGS`, but only while the setup wizard is running. After setup the same call returns `false` without error.
+On a Honeywell CT70 with Android 15, the first call of `DevicePolicyManager.clearResetPasswordToken` after a factory reset fails with a `SecurityException` for `WRITE_SECURE_SETTINGS`, whichever app makes it. Every later call behaves as documented: with no token set it returns `false`. A device owner that makes this call during setup is usually the first caller and fails. A workaround is described below.
 
 ## Tested device
 
@@ -19,6 +19,8 @@ CT70 (product CT70-L0-G), Wi-Fi only, Android 15, GMS. Same result on both build
 | 2 | `setResetPasswordToken` | `true` | `true` |
 | 3 | `isResetPasswordTokenActive` | `true` | `true` |
 | 4 | `clearResetPasswordToken` (token set) | `true` | `true` |
+
+In these runs the call after setup was always the second call since the factory reset. It returns `false` because of that, not because setup has finished (see "First call after a factory reset").
 
 Stack trace of step 1 during setup (build 615.00.01.0040-G; on 615.00.05.0089-G only the `Parcel` and `ContentProvider` line numbers differ):
 
@@ -64,9 +66,37 @@ at com.android.providers.settings.SettingsProvider.insertGlobalSetting(SettingsP
 
 The permission check in `mutateGlobalSetting` now passes; the next check fails. The global setting is written in the name of package `android` (`system_server`), while the calling UID is still that of the device owner app (10223 = UID of the probe in this run). Granting the permission does not avoid the failure.
 
+## First call after a factory reset
+
+Build 615.00.05.0089-G, 2026-10-22. Log of rows 2 and 3: [`evidence/ct70_615.00.05.0089-G_2026-10-22_first-call-other-app_logcat.txt`](evidence/ct70_615.00.05.0089-G_2026-10-22_first-call-other-app_logcat.txt) (the device clock and time zone are set during setup, hence the jump in the timestamps).
+
+| # | Situation | Result of `clearResetPasswordToken` (no token set) |
+|---|---|---|
+| 1 | Probe as device owner after setup, first call after a reboot | `false` |
+| 2 | Fresh device, first call, from a copy of the probe under another package name that is not a device admin | `SecurityException: Permission denial, must have one of: [android.permission.WRITE_SECURE_SETTINGS]` |
+| 3 | Then the probe as device owner during setup (QR provisioning) | `false` (steps 2 to 4 `true`) |
+| 4 | Fresh device, first call, from the shell: `adb shell service call device_policy 296 i32 0 s16 com.android.shell` | `SecurityException: Package android does not belong to 2000` (the shell holds `WRITE_SECURE_SETTINGS`, so the next check fails, as in the section above) |
+| 5 | Second shell call | `NullPointerException: ComponentName is null` (regular behaviour) |
+| 6 | Then a call from an app that is not a device admin | `SecurityException: Admin ... does not exist or is not owned by uid ...` (regular behaviour) |
+
+The failure happens before any admin check: the caller in row 2 is not even an active admin. Whatever the device records after the first call survives reboots and is only cleared by a factory reset. It is not a setting: `settings list global`, `secure` and `system` are identical before and after the first call. On this build `clearResetPasswordToken` takes the code path without the device policy engine (`ComponentName is null` is the `Objects.requireNonNull` message of that path). 296 is `IDevicePolicyManager.Stub.TRANSACTION_clearResetPasswordToken` in the `framework.jar` of 615.00.05.0089-G; check it on other builds before using `service call`.
+
 ## Impact
 
-The BlackBerry UEM Client (12.54.2) calls `clearResetPasswordToken` in the admin policy compliance step of a "Work space only" (fully managed) activation. The exception aborts the activation, the client shows error 3006 and factory-resets the device. Fully managed enrollment with BlackBerry UEM is therefore not possible on these CT70 builds.
+The BlackBerry UEM Client (12.54.2) calls `clearResetPasswordToken` in the admin policy compliance step of a "Work space only" (fully managed) activation. The exception aborts the activation, the client shows error 3006 and factory-resets the device. Fully managed enrollment with BlackBerry UEM is therefore not possible on these CT70 builds without the workaround below.
+
+## Workaround
+
+Make the first call after the factory reset and before the MDM QR code is scanned. `warmup/` is a minimal app for this (`dist/ct70-warmup.apk`, package `de.ixtech.ct70warmup`, no permissions): its launcher activity calls `clearResetPasswordToken` once, logs the outcome with tag `CT70Warmup` and finishes. With this, a BlackBerry UEM "Work space only" activation that failed with error 3006 before completed on the tested CT70.
+
+Without ADB the Honeywell Enterprise Provisioner can do it from the scan screen of the setup wizard. [`ep/ct70-token-warmup.xml`](ep/ct70-token-warmup.xml) is an Enterprise Provisioner project (device settings package HON660 [89-90].00.03) that waits for network, installs the warmup app from this repository and launches it, waits 5 seconds and uninstalls it:
+
+1. In the Enterprise Provisioner, import the project under Provisioning and leave "Download files from Enterprise Provisioner" unchecked.
+2. Under Settings, add the Wi-Fi profile of the site (Wireless and networks > WiFi > Supplicant > WiFiProfile1).
+3. Generate the barcode with the setup wizard kept running, so that the MDM QR code can be scanned afterwards.
+4. After the factory reset, press Start on the welcome screen, scan the barcode in the "HoneywellSetup" scan screen, wait until the warmup app has been installed and removed, then scan the MDM QR code.
+
+The shell call in row 4 would work without an app, but the Provisioner's command filter does not run `service` (it allows `am`, `pm`, `dpm`, `content`, `input`, `screenrecord`, `settings` and `appops`).
 
 ## Notes
 
@@ -88,7 +118,8 @@ if (!mHasFeature || !mLockPatternUtils.hasSecureLockScreen()) {
 
 ## Open points
 
-- Which global setting is written during the call, and by which `system_server` component.
+- Which global setting is written during the first call, and by which `system_server` component.
+- What the device records after the first call, so that later calls no longer write it.
 
 ## Requirements
 
@@ -120,6 +151,9 @@ if (!mHasFeature || !mLockPatternUtils.hasSecureLockScreen()) {
 | Path | Content |
 |---|---|
 | `app/` | Probe source (device admin receiver, provisioning mode and policy compliance activities, test) |
-| `dist/ct70-probe.apk` | Prebuilt APK, debug-signed |
+| `warmup/` | Warmup app source (see "Workaround") |
+| `dist/ct70-probe.apk` | Prebuilt probe APK, debug-signed |
+| `dist/ct70-warmup.apk` | Prebuilt warmup APK, debug-signed |
+| `ep/ct70-token-warmup.xml` | Enterprise Provisioner project for the workaround |
 | `tools/make_qr.py` | Creates the provisioning QR code for a given download URL |
 | `evidence/` | Logcat of the runs on the tested device |
