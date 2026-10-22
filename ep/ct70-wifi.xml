@@ -1,0 +1,40 @@
+<?xml version="1.0" standalone="yes"?>
+<ConfigDoc name="DeviceConfig">
+   <Section name="Wireless and networks">
+      <Section name="WiFi">
+         <Section name="Supplicant">
+            <Section name="WiFiProfile1">
+               <Key name="SSID">DEMO-SSID</Key>
+               <Key name="BSSID"></Key>
+               <Key name="Assoc Mode">2</Key>
+               <Key name="PSK" flags="1024">DEMO-PASSWORD</Key>
+               <Key name="Encryption">3</Key>
+               <Key name="EAP Method">0</Key>
+               <Key name="Phase 2 authentication">0</Key>
+               <Key name="Identity"></Key>
+               <Key name="Password" flags="1024"></Key>
+               <Key name="anonymous_identity"></Key>
+               <Key name="Tunnel PAC"></Key>
+               <Key name="Machine PAC"></Key>
+               <Key name="Provisioning">0</Key>
+               <Key name="CA Certificate"></Key>
+               <Key name="Client Certificate"></Key>
+               <Key name="Private Key"></Key>
+               <Key name="Private Key Password"></Key>
+               <Key name="AP Proxy type">0</Key>
+               <Key name="AP Proxy hostname"></Key>
+               <Key name="AP Proxy port"></Key>
+               <Key name="AP Proxy bypass list"></Key>
+               <Key name="AP Proxy PAC URL"></Key>
+               <Key name="IP type">0</Key>
+            </Section>
+         </Section>
+      </Section>
+   </Section>
+   <SettingsPackage>pkg/HON660/[89-90].00.03/</SettingsPackage>
+   <HHPReserved name="HHPReserved">
+      <Section>
+         <Key name="EXMVersion">1</Key>
+      </Section>
+   </HHPReserved>
+</ConfigDoc>

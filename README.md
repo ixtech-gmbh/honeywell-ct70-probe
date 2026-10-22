@@ -91,8 +91,8 @@ Make the first call after the factory reset and before the MDM QR code is scanne
 
 Without ADB the Honeywell Enterprise Provisioner can do it from the scan screen of the setup wizard. [`ep/ct70-token-warmup.xml`](ep/ct70-token-warmup.xml) is an Enterprise Provisioner project (device settings package HON660 [89-90].00.03) that waits for network, installs the warmup app from this repository and launches it, waits 5 seconds and uninstalls it:
 
-1. In the Enterprise Provisioner, import the project under Provisioning and leave "Download files from Enterprise Provisioner" unchecked.
-2. Under Settings, add the Wi-Fi profile of the site (Wireless and networks > WiFi > Supplicant > WiFiProfile1).
+1. In the Enterprise Provisioner, import `ep/ct70-token-warmup.xml` under Provisioning and leave "Download files from Enterprise Provisioner" unchecked.
+2. Import [`ep/ct70-wifi.xml`](ep/ct70-wifi.xml) under Settings and replace `DEMO-SSID` and `DEMO-PASSWORD` with the Wi-Fi of the site (Wireless and networks > WiFi > Supplicant > WiFiProfile1; the template is WPA/WPA2 PSK with AES-CCMP and DHCP). The device needs internet access to download the warmup app from GitHub.
 3. Generate the barcode with the setup wizard kept running, so that the MDM QR code can be scanned afterwards.
 4. After the factory reset, press Start on the welcome screen, scan the barcode in the "HoneywellSetup" scan screen, wait until the warmup app has been installed and removed, then scan the MDM QR code.
 
@@ -154,6 +154,7 @@ if (!mHasFeature || !mLockPatternUtils.hasSecureLockScreen()) {
 | `warmup/` | Warmup app source (see "Workaround") |
 | `dist/ct70-probe.apk` | Prebuilt probe APK, debug-signed |
 | `dist/ct70-warmup.apk` | Prebuilt warmup APK, debug-signed |
-| `ep/ct70-token-warmup.xml` | Enterprise Provisioner project for the workaround |
+| `ep/ct70-token-warmup.xml` | Enterprise Provisioner tasks for the workaround |
+| `ep/ct70-wifi.xml` | Enterprise Provisioner Wi-Fi template for the workaround |
 | `tools/make_qr.py` | Creates the provisioning QR code for a given download URL |
 | `evidence/` | Logcat of the runs on the tested device |
