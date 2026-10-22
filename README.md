@@ -79,7 +79,9 @@ Build 615.00.05.0089-G, 2026-10-22. Log of rows 2 and 3: [`evidence/ct70_615.00.
 | 5 | Second shell call | `NullPointerException: ComponentName is null` (regular behaviour) |
 | 6 | Then a call from an app that is not a device admin | `SecurityException: Admin ... does not exist or is not owned by uid ...` (regular behaviour) |
 
-The failure happens before any admin check: the caller in row 2 is not even an active admin. Whatever the device records after the first call survives reboots and is only cleared by a factory reset. It is not a setting: `settings list global`, `secure` and `system` are identical before and after the first call. On this build `clearResetPasswordToken` takes the code path without the device policy engine (`ComponentName is null` is the `Objects.requireNonNull` message of that path). 296 is `IDevicePolicyManager.Stub.TRANSACTION_clearResetPasswordToken` in the `framework.jar` of 615.00.05.0089-G; check it on other builds before using `service call`.
+The failure happens before any admin check: the caller in row 2 is not even an active admin. It is not a setting: `settings list global`, `secure` and `system` are identical before and after the first call, and so are the system properties. On this build `clearResetPasswordToken` takes the code path without the device policy engine (`ComponentName is null` is the `Objects.requireNonNull` message of that path). 296 is `IDevicePolicyManager.Stub.TRANSACTION_clearResetPasswordToken` in the `framework.jar` of 615.00.05.0089-G; check it on other builds before using `service call`.
+
+**A reboot re-arms the failure while setup is not complete.** With `user_setup_complete = 0`, the first call after every boot fails again, so a reboot undoes a previous warmup call. Once setup is complete (`user_setup_complete = 1`), a reboot no longer re-arms it: there the consumed state survives reboots and only a factory reset brings it back (row 1 is `false` after a reboot). This is why the workaround only helps if no reboot happens between the warmup call and the MDM activation.
 
 ## Impact
 
@@ -87,14 +89,16 @@ The BlackBerry UEM Client (12.54.2) calls `clearResetPasswordToken` in the admin
 
 ## Workaround
 
-Make the first call after the factory reset and before the MDM QR code is scanned. `warmup/` is a minimal app for this (`dist/ct70-warmup.apk`, package `de.ixtech.ct70warmup`, no permissions): its launcher activity calls `clearResetPasswordToken` once, logs the outcome with tag `CT70Warmup` and finishes. With this, a BlackBerry UEM "Work space only" activation that failed with error 3006 before completed on the tested CT70.
+Make the first call after the factory reset, after the last reboot and before the MDM QR code is scanned. `warmup/` is a minimal app for this (`dist/ct70-warmup.apk`, package `de.ixtech.ct70warmup`, no permissions): its launcher activity calls `clearResetPasswordToken` once, logs the outcome with tag `CT70Warmup` and finishes.
+
+Verified on 615.00.05.0089-G, 2026-10-22: with the warmup call made and no reboot before provisioning, the device owner's call during setup returned `false` and no exception followed (log [`evidence/ct70_615.00.05.0089-G_2026-10-22_warmup-then-provisioning_logcat.txt`](evidence/ct70_615.00.05.0089-G_2026-10-22_warmup-then-provisioning_logcat.txt), warmup line first, then provisioning). **There must be no reboot between the warmup call and the MDM activation**, because a reboot re-arms the failure during setup (see above). The warmup app cannot cover a later reboot itself: during setup the system keeps a freshly installed app in the stopped state across a reboot, so a `BOOT_COMPLETED` receiver in it never runs.
 
 Without ADB the Honeywell Enterprise Provisioner can do it from the scan screen of the setup wizard. [`ep/ct70-token-warmup.xml`](ep/ct70-token-warmup.xml) is an Enterprise Provisioner project (device settings package HON660 [89-90].00.03) that waits for network, installs the warmup app from this repository and launches it, waits 5 seconds (the delay is given in milliseconds) and uninstalls it:
 
 1. In the Enterprise Provisioner, import `ep/ct70-token-warmup.xml` under Provisioning and leave "Download files from Enterprise Provisioner" unchecked.
 2. Import [`ep/ct70-wifi.xml`](ep/ct70-wifi.xml) under Settings and replace `DEMO-SSID` and `DEMO-PASSWORD` with the Wi-Fi of the site (Wireless and networks > WiFi > Supplicant > WiFiProfile1; the template is WPA/WPA2 PSK with AES-CCMP and DHCP). The device needs internet access to download the warmup app from GitHub.
 3. Generate the barcode with the setup wizard kept running, so that the MDM QR code can be scanned afterwards.
-4. After the factory reset, press Start on the welcome screen, scan the barcode in the "HoneywellSetup" scan screen, wait until the warmup app has been installed and removed, then scan the MDM QR code.
+4. After the factory reset, press Start on the welcome screen, scan the barcode in the "HoneywellSetup" scan screen, wait until the warmup app has been installed and removed, then scan the MDM QR code without rebooting in between.
 
 The shell call in row 4 would work without an app, but the Provisioner's command filter does not run `service` (it allows `am`, `pm`, `dpm`, `content`, `input`, `screenrecord`, `settings` and `appops`).
 

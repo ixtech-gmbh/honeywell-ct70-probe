@@ -1,0 +1,11 @@
+07-01 12:41:20.566 I/CT70Warmup(10323): start: clearResetPasswordToken -> java.lang.SecurityException: Permission denial, must have one of: [android.permission.WRITE_SECURE_SETTINGS]
+10-22 15:18:06.812 I/DevicePolicyManager(2617): Device owner set: ComponentInfo{de.ixtech.ct70probe/de.ixtech.ct70probe.ProbeAdminReceiver} on user 0
+10-22 17:18:20.336 I/CT70Probe(11404): == DURING SETUP (admin policy compliance step)
+10-22 17:18:20.336 I/CT70Probe(11404): device: CT70, build 615.00.05.0089-G, Android 15, patch 2026-07-05
+10-22 17:18:20.336 I/CT70Probe(11404): user_setup_complete = 0
+10-22 17:18:20.336 I/CT70Probe(11404): device owner = true
+10-22 17:18:20.336 I/CT70Probe(11404): WRITE_SECURE_SETTINGS granted = false
+10-22 17:18:20.336 I/CT70Probe(11404): 1 clearResetPasswordToken (no token set) -> false
+10-22 17:18:20.336 I/CT70Probe(11404): 2 setResetPasswordToken -> true
+10-22 17:18:20.336 I/CT70Probe(11404): 3 isResetPasswordTokenActive -> true
+10-22 17:18:20.336 I/CT70Probe(11404): 4 clearResetPasswordToken (token set) -> true
