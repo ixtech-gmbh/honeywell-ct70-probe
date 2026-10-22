@@ -16,7 +16,7 @@
       </Section>
       <Section name='Task'>
          <Key name='Action'>Delay</Key>
-         <Key name='Source'>5</Key>
+         <Key name='Source'>5000</Key>
          <Key name='TaskExecutionSet'>1</Key>
       </Section>
       <Section name='Task'>

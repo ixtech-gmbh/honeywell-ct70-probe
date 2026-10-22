@@ -89,7 +89,7 @@ The BlackBerry UEM Client (12.54.2) calls `clearResetPasswordToken` in the admin
 
 Make the first call after the factory reset and before the MDM QR code is scanned. `warmup/` is a minimal app for this (`dist/ct70-warmup.apk`, package `de.ixtech.ct70warmup`, no permissions): its launcher activity calls `clearResetPasswordToken` once, logs the outcome with tag `CT70Warmup` and finishes. With this, a BlackBerry UEM "Work space only" activation that failed with error 3006 before completed on the tested CT70.
 
-Without ADB the Honeywell Enterprise Provisioner can do it from the scan screen of the setup wizard. [`ep/ct70-token-warmup.xml`](ep/ct70-token-warmup.xml) is an Enterprise Provisioner project (device settings package HON660 [89-90].00.03) that waits for network, installs the warmup app from this repository and launches it, waits 5 seconds and uninstalls it:
+Without ADB the Honeywell Enterprise Provisioner can do it from the scan screen of the setup wizard. [`ep/ct70-token-warmup.xml`](ep/ct70-token-warmup.xml) is an Enterprise Provisioner project (device settings package HON660 [89-90].00.03) that waits for network, installs the warmup app from this repository and launches it, waits 5 seconds (the delay is given in milliseconds) and uninstalls it:
 
 1. In the Enterprise Provisioner, import `ep/ct70-token-warmup.xml` under Provisioning and leave "Download files from Enterprise Provisioner" unchecked.
 2. Import [`ep/ct70-wifi.xml`](ep/ct70-wifi.xml) under Settings and replace `DEMO-SSID` and `DEMO-PASSWORD` with the Wi-Fi of the site (Wireless and networks > WiFi > Supplicant > WiFiProfile1; the template is WPA/WPA2 PSK with AES-CCMP and DHCP). The device needs internet access to download the warmup app from GitHub.
